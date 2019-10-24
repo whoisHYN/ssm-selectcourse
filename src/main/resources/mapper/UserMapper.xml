@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyn.selectcourse.dao.UserDao">
+
+    <resultMap id="UserBaseMap" type="com.hyn.selectcourse.model.User">
+        <id column="id" property="id"/>
+        <result column="login_name" property="loginName"/>
+        <result column="password" property="password"/>
+        <result column="user_name" property="userName"/>
+        <result column="status" property="status"/>
+        <result column="role" property="role"/>
+        <result column="college" property="college"/>
+        <result column="profession" property="profession"/>
+        <result column="grade" property="grade"/>
+        <result column="phone" property="phone"/>
+        <result column="address" property="address"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <select id="getUserByLoginNameAndPassword" parameterType="java.lang.String" resultMap="UserBaseMap">
+        SELECT * FROM t_user
+        WHERE login_name = #{loginName} and password = #{password} and status = #{status}
+    </select>
+
+    <select id="getUserByLoginName" parameterType="java.lang.String" resultMap="UserBaseMap">
+        SELECT * FROM t_user
+        WHERE login_name = #{loginName}
+    </select>
+
+    <select id="checkAccountExist" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT count(*) FROM t_user
+        WHERE login_name = #{loginName} and status = #{status}
+    </select>
+
+    <update id="updateUserInfo" parameterType="java.util.Map">
+        update t_user set user_name = #{userName} ,profession = #{profession},grade = #{grade},phone = #{phone},address = #{address},remark = #{remark}
+        where login_name = #{loginName}
+    </update>
+
+    <update id="updateUserPassword" parameterType="java.util.Map">
+        update t_user set password = #{password}
+        where login_name = #{loginName}
+    </update>
+
+    <select id="getUserList" parameterType="java.util.Map" resultMap="UserBaseMap">
+
+        select * from t_user t where 1=1 and t.status = #{status}
+        <if test="content != null">
+            and ( t.user_name like concat('%',#{content},'%')
+            )
+        </if>
+        order by t.id  limit #{start},#{end}
+    </select>
+
+    <select id="getUserListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+
+        select count(*) from t_user t where 1=1 and t.status = #{status}
+        <if test="content != null">
+            and ( t.user_name like concat('%',#{content},'%')
+            )
+        </if>
+        order by t.id
+    </select>
+
+    <select id="getStudentListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from t_user t join t_user_course t2 on t.login_name = t2.stu_id
+        where t2.course_id = #{courseId}
+        <if test="content != null">
+            and ( t.user_name like concat('%',#{content},'%')
+            )
+        </if>
+        order by t.id
+    </select>
+
+    <select id="getStudentList" parameterType="java.util.Map" resultType="java.util.Map">
+        select t.*,t2.score from t_user t join t_user_course t2 on t.login_name = t2.stu_id
+        where t2.course_id = #{courseId}
+        <if test="content != null">
+            and ( t.user_name like concat('%',#{content},'%')
+            )
+        </if>
+        order by t.id  limit #{start},10
+    </select>
+
+    <delete id="deleteUser" parameterType="java.lang.String">
+        delete from t_user where login_name = #{loginName}
+    </delete>
+
+    <insert id="addUser" parameterType="com.hyn.selectcourse.model.User">
+        insert into t_user (login_name,password,user_name,status,role,college,profession,grade,phone,address,remark)
+        values (#{loginName},#{password},#{userName},#{status},#{role},#{college},#{profession},#{grade},#{phone},#{address},#{remark})
+    </insert>
+
+    <select id="getTeaByUserName" parameterType="java.util.Map" resultType="com.hyn.selectcourse.model.User">
+        select * from t_user where status = #{status} and user_name = #{userName}
+    </select>
+
+    <select id="getAllCourseCount" resultType="java.lang.Integer">
+        select count(*) from t_course where id not in (1)
+    </select>
+
+    <select id="getAllUserCount" resultType="java.lang.Integer">
+        select count(*) from t_user
+    </select>
+
+    <select id="getMyGradeInfo" parameterType="java.lang.String" resultType="java.util.Map">
+        select t1.course_id,t1.stu_id,t1.score,t2.name,t2.credit from t_user_course t1 join t_course t2 on t1.course_id = t2.id
+        where t1.stu_id = #{loginName} and score is not null
+    </select>
+</mapper>

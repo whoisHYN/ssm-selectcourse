@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyn.selectcourse.dao.UserLogDao">
+
+    <resultMap id="UserLogBaseMap" type="com.hyn.selectcourse.model.UserLog">
+        <id column="id" property="id"/>
+        <result column="login_name" property="loginName"/>
+        <result column="time" property="time"/>
+        <result column="type" property="type"/>
+        <result column="detail" property="detail"/>
+        <result column="ip" property="ip"/>
+    </resultMap>
+
+    <insert id="insertUserLog" parameterType="java.util.Map">
+        insert into t_user_log (login_name,time,type,detail,ip) values (#{loginName},now(),#{type},#{detail},#{ip})
+    </insert>
+
+    <select id="getUserLogList" parameterType="java.util.Map" resultMap="UserLogBaseMap">
+
+        select * from t_user_log t where 1=1 and t.login_name = #{loginName}
+        <if test="content != null">
+            and ( (t.login_name like concat('%',#{content},'%'))
+            or (t.type like concat('%',#{content},'%'))
+            or(t.detail like concat('%',#{content},'%'))
+            or (t.ip like concat('%',#{content},'%'))
+            )
+        </if>
+        order by time desc limit #{start},#{end}
+    </select>
+
+    <select id="getUserLogListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+
+        select count(*) from t_user_log t where 1=1 and t.login_name = #{loginName}
+        <if test="content != null">
+            and ( (t.login_name like concat('%',#{content},'%'))
+            or (t.type like concat('%',#{content},'%'))
+            or(t.detail like concat('%',#{content},'%'))
+            or (t.ip like concat('%',#{content},'%'))
+            )
+        </if>
+        order by time desc
+    </select>
+
+</mapper>

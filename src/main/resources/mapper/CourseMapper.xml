@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hyn.selectcourse.dao.CourseDao">
+
+    <resultMap id="CourseBaseMap" type="com.hyn.selectcourse.model.Course">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="required" property="required"/>
+        <result column="tea_name" property="teaName"/>
+        <result column="credit" property="credit"/>
+        <result column="time" property="time"/>
+        <result column="place" property="place"/>
+        <result column="start_week" property="startWeek"/>
+        <result column="end_week" property="endWeek"/>
+        <result column="stu_count" property="stuCount"/>
+        <result column="choose_count" property="chooseCount"/>
+    </resultMap>
+    <resultMap id="CourseMessageBaseMap" type="com.hyn.selectcourse.model.CourseMessage">
+        <result column="course_id" property="courseId"/>
+        <result column="login_name" property="loginName"/>
+        <result column="message" property="message"/>
+        <result column="time" property="time"/>
+
+    </resultMap>
+
+    <insert id="addCourse" parameterType="com.hyn.selectcourse.model.Course">
+        insert into t_course(id,name,required,tea_name,credit,time,place,start_week,end_week,stu_count,choose_count) values (#{id},#{name},#{required},#{teaName},#{credit},#{time},#{place},#{startWeek},#{endWeek},#{stuCount},0)
+    </insert>
+
+    <select id="isExistCourse" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from t_course where 1=1
+        <if test="id != null">
+            and id = #{id}
+        </if>
+        <if test="name != null">
+            and name = #{name}
+        </if>
+        <if test="teaName != null and time  != null ">
+            and tea_name = #{teaName} and time = #{time}
+        </if>
+        <if test="teaName != null and place  != null ">
+            and tea_name = #{teaName} and place = #{place}
+        </if>
+        <if test="time != null and place  != null ">
+            and time = #{time} and place = #{place}
+        </if>
+
+    </select>
+
+    <insert id="insertUSerCourse" parameterType="java.util.Map">
+        insert into t_user_course(random,course_id,tea_name,stu_id) values (#{random},#{courseId},#{teaName},#{stuId})
+    </insert>
+
+    <update id="addChooseCourse" parameterType="java.lang.Long">
+        update t_course set choose_count = choose_count + 1 where id = #{id}
+    </update>
+
+    <update id="reduceChooseCourse" parameterType="java.lang.Long">
+        update t_course set choose_count = choose_count - 1 where id = #{id}
+    </update>
+
+    <select id="getNoChooseCourseList" parameterType="java.util.Map" resultMap="CourseBaseMap">
+        select t1.* from t_course t1
+        where t1.id not in (select DISTINCT course_id from t_user_course where stu_id = #{loginName})
+        and t1.id not in (1)
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+        order by time
+        limit #{start},10
+    </select>
+
+    <select id="getAllCourseList" parameterType="java.util.Map" resultMap="CourseBaseMap">
+        select t1.* from t_course t1
+        where  t1.id not in (1)
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+        order by time
+        limit #{start},10
+    </select>
+
+
+    <select id="getAllCourseListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from t_course t1
+        where  t1.id not in (1)
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+    </select>
+
+    <select id="getTeaCourseList" parameterType="java.util.Map" resultMap="CourseBaseMap">
+        select t1.* from t_course t1
+        where  t1.id not in (1)  and t1.tea_name = #{teaName}
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+        order by time
+        limit #{start},10
+    </select>
+
+    <select id="getTeaCourseListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from t_course t1
+        where  t1.id not in (1) and t1.tea_name = #{teaName}
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+    </select>
+
+    <select id="getNoChooseCourseListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from t_course t1
+        where t1.id not in (select DISTINCT course_id from t_user_course where stu_id = #{loginName})
+        and t1.id not in (1)
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+    </select>
+
+    <select id="getChooseCourseList" parameterType="java.util.Map" resultMap="CourseBaseMap">
+        select t1.* from t_course t1
+        where t1.id  in (select DISTINCT course_id from t_user_course where stu_id = #{loginName})
+        and t1.id not in (1)
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+        order by required desc ,time
+        limit #{start},20
+    </select>
+
+    <select id="getChooseCourseListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from t_course t1
+        where t1.id  in (select DISTINCT course_id from t_user_course where stu_id = #{loginName})
+        and t1.id not in (1)
+        <if test="content != null">
+            and ( (t1.id like concat('%',#{content},'%'))
+            or (t1.name like concat('%',#{content},'%'))
+            or(t1.tea_name like concat('%',#{content},'%'))
+            )
+        </if>
+    </select>
+
+    <select id="getCourseById" parameterType="java.lang.Long" resultMap="CourseBaseMap">
+        select * from t_course where id = #{id}
+    </select>
+
+    <select id="getSaveTimeCourse" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from t_course t1
+                                 join t_user_course t2 on t1.id = t2.course_id
+        where t2.stu_id = #{stuId} and time = #{time}
+    </select>
+
+    <select id="getAllCredit" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select sum(credit) from t_course t1
+                                    join t_user_course t2 on t1.id = t2.course_id
+        where t2.stu_id = #{loginName}
+    </select>
+
+    <delete id="deleteCourse" parameterType="java.util.Map">
+        delete from t_user_course where course_id = #{courseId} and stu_id = #{stuId}
+    </delete>
+
+    <select id="getMessageListByCourseId" parameterType="java.util.Map" resultType="java.util.Map">
+        select t1.*,t2.user_name from t_course_message t1 join t_user t2 on t1.login_name = t2.login_name
+        where t1.course_id = #{courseId}
+        order by time desc limit #{start},5
+    </select>
+
+    <select id="getMessageCountByCourseId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        select count(*) from t_course_message where course_id = #{courseId}
+    </select>
+
+    <insert id="addMessage" parameterType="java.util.Map">
+        insert into t_course_message(course_id,login_name,message,time) values (#{courseId},#{loginName},#{message},now())
+    </insert>
+
+    <update id="openCourse">
+        update t_course set start_week = 0 where id = 1
+    </update>
+
+    <update id="closeCourse">
+        update t_course set start_week = -1 where id = 1
+    </update>
+
+    <select id="noOpen" resultType="java.lang.Integer">
+        select count(*) from t_course where start_week = '-1'
+    </select>
+
+    <select id="screenWillDelete" parameterType="java.util.Map" resultType="java.util.Map">
+        select  stu_id,course_id  from t_user_course where course_id = #{courseId} order by random limit #{stuCount},999
+    </select>
+
+    <delete id="screenStu" parameterType="java.util.Map">
+        delete from t_user_course where course_id = #{course_id} and stu_id = #{stu_id}
+    </delete>
+
+    <update id="updateScore" parameterType="java.util.Map">
+        update t_user_course set score = #{score} where course_id = #{courseId} and stu_id = #{stuId}
+    </update>
+</mapper>
