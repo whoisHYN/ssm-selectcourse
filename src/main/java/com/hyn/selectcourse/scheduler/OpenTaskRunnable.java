@@ -5,13 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * @author huang
+ */
 public class OpenTaskRunnable implements Runnable {
     private Logger logger = LoggerFactory.getLogger(OpenTaskRunnable.class);
 
-    private CourseService courseService;
+    private final CourseService courseService;
 
     public OpenTaskRunnable( CourseService courseService) {
-
         this.courseService = courseService;
     }
 

@@ -55,7 +55,7 @@ public class CodeController {
 
         //绘制字符
         String strCode = "";
-        for(int i=0;i<4;i++){
+        for(int i = 0;i < 4; i++){
             String rand = String.valueOf(random.nextInt(10));
             strCode = strCode + rand;
             g.setColor(new Color(20+random.nextInt(110),20+random.nextInt(110),20+random.nextInt(110)));
