@@ -1,7 +1,7 @@
 # SSM实现选课系统
 ### 基于Spring + SpringMVC + MyBatis搭建选课系统 
 #### 项目描述
-本项目是基于Spring + SpringMVC + MyBatis对选课系统的实现。主要实现了以下功能
+本项目是基于Spring + SpringMVC + MyBatis对选课系统的实现。该选课系统可以针对不同类型的用户开放不同的功能，学生、教师和管理员都可以通过此系统执行各自的操作，如选课和课程管理等。主要实现了以下功能
 1. 用户登录功能，可用于学生用户、教师用户和超级管理员用户登录,流程如下：
 ![无法加载图片](https://github.com/whoisHYN/aloe/blob/master/selectcourse0.JPG)
 2. 学生、教师用户修改个人信息的功能。
