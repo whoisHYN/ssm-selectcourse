@@ -145,7 +145,7 @@
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
-      <version>1.2.31</version>
+      <version>1.2.83</version>
     </dependency>
 
     <!-- 添加日志相关jar包 -->
